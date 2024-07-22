@@ -1,0 +1,53 @@
+spring:
+  datasource:
+    url: ${MYSQL_URL}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: ${MYSQL_USERNAME}
+    password: ${MYSQL_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        #show_sql: true
+        format_sql: true
+        default_batch_fetch_size: 10
+        dialect: org.hibernate.dialect.MySQLDialect
+
+
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+    mongodb:
+      database: auction
+      host: ${MONGODB_HOST}
+      port: ${MONGODB_PORT}
+
+  spring:
+    thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+
+  jwt:
+    secret: ${JWT_SECRET}
+    accessToken_expiration_time: 60000
+    refreshToken_expiration_time: 86400000
+
+
+logging:
+  level:
+    org.hibernate.SQL: debug
+    org.hibernate.orm.jdbc.bind: trace
+
+cloud:
+  aws:
+    s3:
+      bucket: auction-shop-image
+    credentials:
+      access-key: ${AWS_ACCESS_KEY}
+      secret-key: ${AWS_SECRET_KEY}
+    region:
+      static: ap-southeast-2
+    stack:
+      auto: false
