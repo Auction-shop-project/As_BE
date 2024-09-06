@@ -1,15 +1,17 @@
 package Auction_shop.auction.domain.like.controller;
 
+import Auction_shop.auction.domain.alert.service.AlertService;
+import Auction_shop.auction.domain.alert.util.AlertUtil;
 import Auction_shop.auction.domain.like.Like;
 import Auction_shop.auction.domain.like.service.LikeService;
 import Auction_shop.auction.security.jwt.JwtUtil;
+import Auction_shop.auction.web.dto.like.LikeCreateDto;
 import Auction_shop.auction.web.dto.like.LikeListResponseDto;
 import Auction_shop.auction.web.dto.like.LikeMapper;
 import Auction_shop.auction.web.dto.like.LikeResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,13 +21,17 @@ import java.util.stream.Collectors;
 public class LikeController {
 
     private final LikeService likeService;
+    private final AlertService alertService;
     private final LikeMapper likeMapper;
     private final JwtUtil jwtUtil;
+    private final AlertUtil alertUtil;
 
-    @PostMapping("/{productId}")
-    public ResponseEntity<LikeResponseDto> addProductToLike(@RequestHeader("Authorization") String authorization, @PathVariable Long productId){
+    @PostMapping
+    public ResponseEntity<LikeResponseDto> addProductToLike(@RequestHeader("Authorization") String authorization, @RequestBody LikeCreateDto likeCreateDto){
         Long memberId = jwtUtil.extractMemberId(authorization);
-        Like like = likeService.addProductToLike(memberId, productId);
+        Like like = likeService.addProductToLike(memberId, likeCreateDto.getProductId());
+        alertService.add(memberId, "AddLike");
+        alertUtil.run(likeCreateDto.getMemberId(), "addLike");
         LikeResponseDto collect = likeMapper.toResponseDto(like);
         return ResponseEntity.ok(collect);
     }

@@ -1,6 +1,7 @@
 package Auction_shop.auction.chat.service;
 
 import Auction_shop.auction.chat.domain.Chat;
+import Auction_shop.auction.chat.dto.ChatDto;
 import Auction_shop.auction.chat.repository.ChatRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

@@ -118,7 +118,6 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.OK).body(collect);
     }
 
-
     /**
      * 상품 상세 조회
      */

@@ -11,7 +11,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDateTime;
 
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Document(collection = "customChat")
@@ -25,4 +24,6 @@ public class Chat {
 
     @CreatedDate
     private LocalDateTime createdAt;
+
+
 }
