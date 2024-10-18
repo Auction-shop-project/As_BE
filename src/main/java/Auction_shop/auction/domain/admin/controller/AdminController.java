@@ -90,7 +90,7 @@ public class AdminController {
 
     //문의 답변
     @PostMapping("/inquiry/{id}")
-    public ResponseEntity<InquiryResponseDto> addAnswer(@PathVariable("id") Long id, CreateAnswerDto createAnswerDto){
+    public ResponseEntity<InquiryResponseDto> addAnswer(@PathVariable("id") Long id, @RequestBody CreateAnswerDto createAnswerDto){
         Inquiry inquiry = inquiryService.addAnswer(id, createAnswerDto.getContent());
         InquiryResponseDto collect = inquiryMapper.toResponseDto(inquiry);
         return ResponseEntity.status(HttpStatus.CREATED).body(collect);
