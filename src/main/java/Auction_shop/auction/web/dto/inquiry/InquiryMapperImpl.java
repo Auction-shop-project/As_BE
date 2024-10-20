@@ -34,6 +34,8 @@ public class InquiryMapperImpl implements InquiryMapper{
                 .title(inquiry.getTitle())
                 .content(inquiry.getContent())
                 .imageUrl(imageUrl)
+                .createAt(inquiry.getCreatedAt())
+                .nickname(inquiry.getMember().getNickname())
                 .status(inquiry.isStatus())
                 .answer(inquiry.isStatus() ? inquiry.getAnswer() : null)
                 .build();
