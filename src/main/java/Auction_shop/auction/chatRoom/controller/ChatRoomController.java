@@ -1,6 +1,7 @@
 package Auction_shop.auction.chatRoom.controller;
 
 import Auction_shop.auction.chatRoom.domain.ChatRoom;
+import Auction_shop.auction.chatRoom.dto.ChatRoomCreateResponseDto;
 import Auction_shop.auction.chatRoom.dto.ChatRoomInfoResponseDto;
 import Auction_shop.auction.chatRoom.dto.ChatRoomListResponseDto;
 import Auction_shop.auction.chatRoom.service.ChatRoomService;
@@ -53,8 +54,8 @@ public class ChatRoomController {
                 String idTypeChange = String.valueOf(yourId);
                 messageQueue.opsForList().leftPush(idTypeChange, newChatRoomId);  // 메세지 큐에 저장
             }
-
-            return ResponseEntity.ok(newChatRoomId);
+            ChatRoomCreateResponseDto chatRoomCreateResponseDto = new ChatRoomCreateResponseDto(newChatRoomId);
+            return ResponseEntity.ok(chatRoomCreateResponseDto);
         }
 
         // case 2
