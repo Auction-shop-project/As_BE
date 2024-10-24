@@ -1,10 +1,10 @@
 package Auction_shop.auction.chatRoom.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
-@AllArgsConstructor
+@Setter
 public class ChatRoomCreateResponseDto {
 
     private Long newChatRoomId;
