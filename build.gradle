@@ -50,6 +50,10 @@ dependencies {
 	//ElasticSearch
 	implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
 
+	//firebase
+	implementation 'com.google.firebase:firebase-admin:6.8.1'
+	implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.2.2'
+
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
 	runtimeOnly 'com.mysql:mysql-connector-j'
