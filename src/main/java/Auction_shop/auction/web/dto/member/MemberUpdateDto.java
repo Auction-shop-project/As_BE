@@ -19,6 +19,7 @@ public class MemberUpdateDto {
     private String phone;
     private String address;
     private String detailAddress;
+    private String deviceToken;
     private String zipcode;
     private Set<String> categories;
     private boolean changeImage;

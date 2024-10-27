@@ -40,7 +40,7 @@ public class MemberService {
     private String adminKey;
 
     @Transactional
-    public Member save(String uuid){
+    public Member save(String uuid, String deviceToken){
         Member member = Member.builder()
                 .uuid(uuid)
                 .role("USER")
@@ -48,6 +48,7 @@ public class MemberService {
                 .nickname(uuid)
                 .email(uuid)
                 .phone("TEST")
+                .deviceToken(deviceToken)
                 .point(0l)
                 .build();
         memberRepository.save(member);
