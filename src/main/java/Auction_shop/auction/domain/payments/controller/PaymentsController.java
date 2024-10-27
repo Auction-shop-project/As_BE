@@ -37,5 +37,6 @@ public class PaymentsController {
 
         alertUtil.run(member.getId(), member.getNickname(), "새로운 입찰", AlertType.newBid);
         return ResponseEntity.ok(result);
+
     }
 }
