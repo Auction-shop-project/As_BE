@@ -21,7 +21,7 @@ import java.util.List;
 public class FirebaseCloudMessageService {
 
     private final String API_URL = "https://fcm.googleapis.com/v1/projects/" +
-            "fcmheybid/messages:send";
+            "auction-shop-a3d28/messages:send";
     private final ObjectMapper objectMapper;
 
     public void sendMessageTo(String targetToken, String title, String body) throws IOException {
