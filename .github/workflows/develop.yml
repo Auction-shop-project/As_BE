@@ -87,7 +87,7 @@ jobs:
       - name: Configure Firebase Admin SDK
         run: |
           mkdir -p src/main/resources/firebase
-          echo "${{ secrets.FCM_JSON}}" | base64 --decode > src/main/resources/firebase/serviceAccountKey.json
+          echo "${{ secrets.FCM_JSON }}" | base64 --decode > src/main/resources/firebase/serviceAccountKey.json
 
       - name: Build with Gradle
         run: ./gradlew build -i
