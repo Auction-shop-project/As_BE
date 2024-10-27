@@ -31,7 +31,9 @@ public class AuthService {
         Member member = memberService.getByUuid(authRequestDto.getUuid());
 
         if(member == null){
-            member = memberService.save(authRequestDto.getUuid());
+            member = memberService.save(authRequestDto.getUuid(), authRequestDto.getDeviceToken());
+        }else if(member.getDeviceToken() != authRequestDto.getDeviceToken()){
+            member.updateDeviceToken(authRequestDto.getDeviceToken());
         }
 
         MemberResponseDto memberResponseDto = MemberResponseDto.builder()

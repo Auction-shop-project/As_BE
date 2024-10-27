@@ -11,4 +11,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class AuthRequestDto {
     String uuid;
+    String deviceToken;
 }

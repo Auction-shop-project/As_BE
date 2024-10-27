@@ -50,6 +50,9 @@ public class Member extends BaseEntity {
     @Column(nullable = false)
     private Long point;
 
+    @Column(nullable = false)
+    private String deviceToken;
+
     @OneToOne(orphanRemoval = true, cascade = CascadeType.ALL)
     @JoinColumn(name = "image_id")
     private Image profileImage;
@@ -103,6 +106,10 @@ public class Member extends BaseEntity {
 
     public void setProfileImage(Image profileImage){
         this.profileImage = profileImage;
+    }
+
+    public void updateDeviceToken(String deviceToken){
+        this.deviceToken = deviceToken;
     }
 
     //연관 관계 편의 메서드
