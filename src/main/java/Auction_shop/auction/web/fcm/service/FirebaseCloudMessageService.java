@@ -25,6 +25,7 @@ public class FirebaseCloudMessageService {
     private final ObjectMapper objectMapper;
 
     public void sendMessageTo(String targetToken, String title, String body) throws IOException {
+        System.out.println("진입 성공 ㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇ");
         String message = makeMessage(targetToken, title, body);
 
         OkHttpClient client = new OkHttpClient();
@@ -38,7 +39,9 @@ public class FirebaseCloudMessageService {
                 .build();
 
         Response response = client.newCall(request).execute();
-
+        System.out.println("title = " + title);
+        System.out.println("body = " + body);
+        System.out.println("푸시 알림 전송 완료");
         System.out.println(response.body().string());
     }
 
