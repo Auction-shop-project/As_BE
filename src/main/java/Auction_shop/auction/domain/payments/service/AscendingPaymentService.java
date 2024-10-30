@@ -13,6 +13,7 @@ import Auction_shop.auction.domain.product.ProductDocument;
 import Auction_shop.auction.domain.product.repository.ProductElasticsearchRepository;
 import Auction_shop.auction.domain.product.repository.ProductJpaRepository;
 import Auction_shop.auction.web.dto.product.ProductMapper;
+import Auction_shop.auction.web.fcm.NotificationType;
 import Auction_shop.auction.web.fcm.service.FirebaseCloudMessageService;
 import com.siot.IamportRestClient.IamportClient;
 import com.siot.IamportRestClient.exception.IamportResponseException;
@@ -92,7 +93,9 @@ public class AscendingPaymentService {
             System.out.println("대상 유저 아이디 = " + existingPayment.getMember().getId());
             fcmService.sendMessageTo(existingPayment.getMember().getDeviceToken(),
                     "입찰 실패!",
-                    "누군가가 더 높은 금액으로 입찰을 시도했어요,,,");
+                    "누군가가 더 높은 금액으로 입찰을 시도했어요,,,",
+                    productId,
+                    NotificationType.PRODUCT);
         }
 
         // 새로운 결제 저장
@@ -130,7 +133,9 @@ public class AscendingPaymentService {
         System.out.println("대상 유저 아이디 = " + product.getMember().getId());
         fcmService.sendMessageTo(product.getMember().getDeviceToken(),
                 "입찰 시도!",
-                "더 높은 금액의 입찰이 들어왔어요!");
+                "더 높은 금액의 입찰이 들어왔어요!",
+                productId,
+                NotificationType.PRODUCT);
 
         return "결제가 완료되었습니다. 새로운 입찰 금액: " + bidAmount;
     }
