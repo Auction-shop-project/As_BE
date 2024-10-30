@@ -18,6 +18,7 @@ import Auction_shop.auction.domain.product.Product;
 import Auction_shop.auction.domain.purchase.Purchase;
 import Auction_shop.auction.domain.purchase.service.PurchaseService;
 import Auction_shop.auction.web.dto.product.*;
+import Auction_shop.auction.web.fcm.service.FirebaseCloudMessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -27,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -43,6 +45,7 @@ public class ProductServiceImpl implements ProductService {
     private final ProductMapper productMapper;
     private final ImageService imageService;
     private final BidRedisRepository bidRedisRepository;
+    private final FirebaseCloudMessageService fcmService;
 
     @Override
     @Transactional
@@ -208,10 +211,11 @@ public class ProductServiceImpl implements ProductService {
         productElasticsearchRepository.save(productDocument);
     }
 
+    //추후 알림 보내는 메서드 진행 중 속도 저하 개선 필수
     @Override
     @Scheduled(fixedRate = 10000)
     @Transactional
-    public void checkProductToEnd() {
+    public void checkProductToEnd() throws IOException {
         LocalDateTime currentTime = LocalDateTime.now();
         int pageSize = 2000;
         int pageNumber = 0;
@@ -240,6 +244,18 @@ public class ProductServiceImpl implements ProductService {
                     highestBid.changeStatus(BidStatus.SUCCESS);
                     bidRedisRepository.updateBidInRedis(highestBid);
                     //Todo 경매 우승자에게 알림 보내기 추가 부탁드립니다
+
+                    //물건 올렸던 사람에게 푸시 알림
+                    System.out.println("알림 받은 유저 = " + product.getMember().getId());
+                    fcmService.sendMessageTo(product.getMember().getDeviceToken(),
+                            "경매 종료!",
+                            product.getTitle()+"의 경매가 끝났어요!");
+
+                    //경매 우승자에게 푸시 알림
+                    System.out.println("알림 받은 유저 = " + memberId);
+                    fcmService.sendMessageTo(member.getDeviceToken(),
+                            "경매 종료!",
+                            product.getTitle()+"의 입찰에 성공했어요!");
                 }
                 updatedProducts.add(product);
             }
