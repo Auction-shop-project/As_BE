@@ -54,7 +54,8 @@ public class ChatRoomController {
                 String idTypeChange = String.valueOf(yourId);
                 messageQueue.opsForList().leftPush(idTypeChange, newChatRoomId);  // 메세지 큐에 저장
             }
-            ChatRoomCreateResponseDto chatRoomCreateResponseDto = new ChatRoomCreateResponseDto(newChatRoomId);
+            ChatRoomCreateResponseDto chatRoomCreateResponseDto = new ChatRoomCreateResponseDto();
+            chatRoomCreateResponseDto.setNewChatRoomId(newChatRoomId);
             return ResponseEntity.ok(chatRoomCreateResponseDto);
         }
 

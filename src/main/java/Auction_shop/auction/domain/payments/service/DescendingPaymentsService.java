@@ -7,6 +7,7 @@ import Auction_shop.auction.domain.payments.repository.PaymentsRepository;
 import Auction_shop.auction.domain.product.Product;
 import Auction_shop.auction.domain.product.repository.ProductJpaRepository;
 import Auction_shop.auction.domain.product.service.ProductService;
+import Auction_shop.auction.web.fcm.service.FirebaseCloudMessageService;
 import com.siot.IamportRestClient.IamportClient;
 import com.siot.IamportRestClient.exception.IamportResponseException;
 import com.siot.IamportRestClient.request.CancelData;
@@ -30,6 +31,7 @@ public class DescendingPaymentsService {
     private final MemberService memberService;
     private final ProductJpaRepository productJpaRepository;
     private final ProductService productService;
+    private final FirebaseCloudMessageService fcmService;
 
     @Value("${iamport.key}")
     private String apiKey;
@@ -79,6 +81,11 @@ public class DescendingPaymentsService {
         paymentsRepository.save(payments);
 
         productService.purchaseProductItem(productId, memberId);
+
+        //물건 올린 사람에게 푸시 알림
+        fcmService.sendMessageTo(product.getMember().getDeviceToken(),
+                "경매 종료!",
+                product.getTitle()+"의 경매가 종료되었어요!");
 
         return "결제가 완료되었습니다.";
     }

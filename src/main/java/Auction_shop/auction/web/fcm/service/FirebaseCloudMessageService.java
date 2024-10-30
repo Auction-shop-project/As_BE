@@ -39,7 +39,9 @@ public class FirebaseCloudMessageService {
                 .build();
 
         Response response = client.newCall(request).execute();
-
+        System.out.println("title = " + title);
+        System.out.println("body = " + body);
+        System.out.println("푸시 알림 전송 완료");
         System.out.println(response.body().string());
     }
 
