@@ -13,4 +13,5 @@ public class FcmRequestDto {
     private String title;
     private String body;
     private NotificationType type;
+    private Long Id;
 }

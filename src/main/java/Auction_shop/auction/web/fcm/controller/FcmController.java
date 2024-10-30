@@ -27,6 +27,7 @@ public class FcmController {
                 fcmRequestDto.getTargetToken(),
                 fcmRequestDto.getTitle(),
                 fcmRequestDto.getBody(),
+                fcmRequestDto.getId(),
                 fcmRequestDto.getType()
         );
         return ResponseEntity.ok().build();
