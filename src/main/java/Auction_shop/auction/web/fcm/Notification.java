@@ -13,4 +13,6 @@ public class Notification {
     private String title;
     private String body;
     private String image;
+    private NotificationType type;
+    private Long Id;
 }

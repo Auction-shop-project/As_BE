@@ -3,6 +3,7 @@ package Auction_shop.auction.web.fcm.service;
 import Auction_shop.auction.web.fcm.FcmMessage;
 import Auction_shop.auction.web.fcm.Message;
 import Auction_shop.auction.web.fcm.Notification;
+import Auction_shop.auction.web.fcm.NotificationType;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,9 +25,8 @@ public class FirebaseCloudMessageService {
             "auction-shop-a3d28/messages:send";
     private final ObjectMapper objectMapper;
 
-    public void sendMessageTo(String targetToken, String title, String body) throws IOException {
-        System.out.println("진입 성공 ㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇ");
-        String message = makeMessage(targetToken, title, body);
+    public void sendMessageTo(String targetToken, String title, String body, Long Id,NotificationType type) throws IOException {
+        String message = makeMessage(targetToken, title, body, Id, type);
 
         OkHttpClient client = new OkHttpClient();
         RequestBody requestBody = RequestBody.create(message,
@@ -45,13 +45,15 @@ public class FirebaseCloudMessageService {
         System.out.println(response.body().string());
     }
 
-    private String makeMessage(String targetToken, String title, String body) throws JsonParseException, JsonProcessingException {
+    private String makeMessage(String targetToken, String title, String body, Long Id, NotificationType type) throws JsonParseException, JsonProcessingException {
         FcmMessage fcmMessage = FcmMessage.builder()
                 .message(Message.builder()
                         .token(targetToken)
                         .notification(Notification.builder()
                                 .title(title)
                                 .body(body)
+                                .Id(Id)
+                                .type(type)
                                 .image(null)
                                 .build()
                         ).build()).validateOnly(false).build();

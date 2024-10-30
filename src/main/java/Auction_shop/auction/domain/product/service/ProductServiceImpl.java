@@ -18,6 +18,7 @@ import Auction_shop.auction.domain.product.Product;
 import Auction_shop.auction.domain.purchase.Purchase;
 import Auction_shop.auction.domain.purchase.service.PurchaseService;
 import Auction_shop.auction.web.dto.product.*;
+import Auction_shop.auction.web.fcm.NotificationType;
 import Auction_shop.auction.web.fcm.service.FirebaseCloudMessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -249,13 +250,17 @@ public class ProductServiceImpl implements ProductService {
                     System.out.println("알림 받은 유저 = " + product.getMember().getId());
                     fcmService.sendMessageTo(product.getMember().getDeviceToken(),
                             "경매 종료!",
-                            product.getTitle()+"의 경매가 끝났어요!");
+                            product.getTitle()+"의 경매가 끝났어요!",
+                            product.getId(),
+                            NotificationType.PRODUCT);
 
                     //경매 우승자에게 푸시 알림
                     System.out.println("알림 받은 유저 = " + memberId);
                     fcmService.sendMessageTo(member.getDeviceToken(),
                             "경매 종료!",
-                            product.getTitle()+"의 입찰에 성공했어요!");
+                            product.getTitle()+"의 입찰에 성공했어요!",
+                            product.getId(),
+                            NotificationType.PRODUCT);
                 }
                 updatedProducts.add(product);
             }
