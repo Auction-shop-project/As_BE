@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -28,14 +29,14 @@ public class BidController {
 
     //상향식 입찰 넣기
     @PostMapping("/{productId}/{impUid}")
-    public ResponseEntity<String> addBid(@RequestHeader("Authorization") String authorization,
+    public ResponseEntity<Map<String, Object>> addBid(
                                                  @PathVariable("productId") Long productId,
                                                  @PathVariable String impUid) {
-        Long memberId = jwtUtil.extractMemberId(authorization);
+//        Long memberId = jwtUtil.extractMemberId(authorization);
         String paymentResult;
         try {
             // 결제 검증
-            paymentResult = ascendingPaymentService.PaymentsVerify(impUid, productId, memberId);
+            ResponseEntity<Map<String, Object>> collect = ascendingPaymentService.PaymentsVerify(impUid, productId, 2L);
 
             // 입찰 성공 알림 (옵션)
             Member member = productJpaRepository.findById(productId)
@@ -43,7 +44,7 @@ public class BidController {
                     .getMember();
             alertUtil.run(member.getId(), member.getNickname(), "새로운 입찰", AlertType.newBid);
 
-            return ResponseEntity.ok(paymentResult);
+            return collect;
         } catch (RuntimeException e) {
             return ResponseEntity.status(400).body(null);
         } catch (Exception e) {

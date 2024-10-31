@@ -7,7 +7,6 @@ import Auction_shop.auction.domain.payments.repository.PaymentsRepository;
 import Auction_shop.auction.domain.product.Product;
 import Auction_shop.auction.domain.product.repository.ProductJpaRepository;
 import Auction_shop.auction.domain.product.service.ProductService;
-import Auction_shop.auction.web.fcm.NotificationType;
 import Auction_shop.auction.web.fcm.service.FirebaseCloudMessageService;
 import com.siot.IamportRestClient.IamportClient;
 import com.siot.IamportRestClient.exception.IamportResponseException;
@@ -17,10 +16,13 @@ import com.siot.IamportRestClient.response.Payment;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -46,7 +48,7 @@ public class DescendingPaymentsService {
     }
 
     @Transactional
-    public String PaymentsVerify(String impUid, Long productId, Long memberId) throws IamportResponseException, IOException {
+    public ResponseEntity<Map<String, Object>> PaymentsVerify(String impUid, Long productId, Long memberId) throws IamportResponseException, IOException {
 
         Product product = productJpaRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException(productId + "에 해당하는 물건이 없습니다."));
@@ -65,7 +67,9 @@ public class DescendingPaymentsService {
 
         if (paidAmount != productPrice) {
             cancelAllPayment(impUid);
-            return "지불한 금액 : " + paidAmount + "와 데이터베이스 금액: " + productPrice + "가 일치하지 않음.";
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "지불한 금액 : " + paidAmount + "와 데이터베이스 금액 " + productPrice + "가 일치하지 않음.");
+            return ResponseEntity.badRequest().body(response); // 400 Bad Request 응답
         }
 
         Member member = memberService.getById(memberId);
@@ -87,10 +91,15 @@ public class DescendingPaymentsService {
         fcmService.sendMessageTo(product.getMember().getDeviceToken(),
                 "경매 종료!",
                 product.getTitle()+"의 경매가 종료되었어요!",
-                productId,
-                NotificationType.PRODUCT);
+                Long.toString(productId),
+                "PRODUCT");
 
-        return "결제가 완료되었습니다.";
+        // 결제가 완료되었을 때 JSON 응답 생성
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "결제가 완료되었습니다. 결제 금액 : " + paidAmount);
+
+        // ResponseEntity를 사용하여 JSON 형식으로 반환
+        return ResponseEntity.ok(response);
     }
 
     private void cancelAllPayment(String impUid) {
