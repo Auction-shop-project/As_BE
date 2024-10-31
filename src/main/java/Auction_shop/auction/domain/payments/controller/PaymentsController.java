@@ -7,8 +7,12 @@ import Auction_shop.auction.domain.payments.service.DescendingPaymentsService;
 import Auction_shop.auction.domain.product.repository.ProductJpaRepository;
 import Auction_shop.auction.security.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/payments")
@@ -20,15 +24,18 @@ public class PaymentsController {
     private final AlertUtil alertUtil;
 
     @PostMapping("/{productId}/{impUid}")
-    public ResponseEntity<String> createPayments(@RequestHeader("Authorization") String authorization,
+    public  ResponseEntity<Map<String, Object>> createPayments(@RequestHeader("Authorization") String authorization,
                                                    @PathVariable Long productId,
                                                    @PathVariable String impUid){
         Long memberId = jwtUtil.extractMemberId(authorization);
-        String result;
+        ResponseEntity<Map<String, Object>>  collect;
         try {
-            result = descendingPaymentsService.PaymentsVerify(impUid, productId, memberId);
+            collect = descendingPaymentsService.PaymentsVerify(impUid, productId, memberId);
         } catch (Exception e) {
-            return ResponseEntity.status(500).body("결제 검증 중 오류 발생: " + e.getMessage());
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("error", "결제 검증 중 오류 발생");
+            errorResponse.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
 
         Member member = productRepository.findById(productId)
@@ -36,7 +43,7 @@ public class PaymentsController {
                 .getMember();
 
         alertUtil.run(member.getId(), member.getNickname(), "새로운 입찰", AlertType.newBid);
-        return ResponseEntity.ok(result);
+        return collect;
 
     }
 }

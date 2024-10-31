@@ -5,7 +5,6 @@ import Auction_shop.auction.chat.dto.ChatDto;
 import Auction_shop.auction.chat.service.ChatService;
 import Auction_shop.auction.chatRoom.service.ChatRoomService;
 import Auction_shop.auction.domain.member.Member;
-import Auction_shop.auction.web.fcm.NotificationType;
 import Auction_shop.auction.web.fcm.service.FirebaseCloudMessageService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,8 +50,8 @@ public class ChatController {
             fcmService.sendMessageTo(member.getDeviceToken(),
                     "채팅 도착!",
                     chat.getMessage(),
-                    Long.parseLong(roomId),
-                    NotificationType.CHAT);
+                    roomId,
+                    "CHAT");
         } catch (Exception e) {
             log.error("ChatError = {}", e);
             messagingTemplate.convertAndSend(destination, "Error:" + e.getMessage());

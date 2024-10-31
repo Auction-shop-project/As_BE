@@ -13,7 +13,6 @@ import Auction_shop.auction.domain.product.ProductDocument;
 import Auction_shop.auction.domain.product.repository.ProductElasticsearchRepository;
 import Auction_shop.auction.domain.product.repository.ProductJpaRepository;
 import Auction_shop.auction.web.dto.product.ProductMapper;
-import Auction_shop.auction.web.fcm.NotificationType;
 import Auction_shop.auction.web.fcm.service.FirebaseCloudMessageService;
 import com.siot.IamportRestClient.IamportClient;
 import com.siot.IamportRestClient.exception.IamportResponseException;
@@ -23,11 +22,14 @@ import com.siot.IamportRestClient.response.Payment;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -56,7 +58,7 @@ public class AscendingPaymentService {
     }
 
     @Transactional
-    public String PaymentsVerify(String impUid, Long productId, Long memberId) throws IamportResponseException, IOException {
+    public ResponseEntity<Map<String, Object>> PaymentsVerify(String impUid, Long productId, Long memberId) throws IamportResponseException, IOException {
 
         Product product = productJpaRepository.findByProductIdWithLock(productId) // Pessimistic Locking 적용
                 .orElseThrow(() -> new IllegalArgumentException(productId + "에 해당하는 물건이 없습니다."));
@@ -77,7 +79,9 @@ public class AscendingPaymentService {
         // 새로운 입찰 금액이 기존 가격보다 낮으면 결제 취소
         if (bidAmount <= currentPrice) {
             cancelPayment(impUid);
-            return "지불한 금액 : " + bidAmount + "가 현재 가격 : " + currentPrice + "보다 높지 않음.";
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "지불한 금액 : " + bidAmount + "가 현재 가격 : " + currentPrice + "보다 높지 않음.");
+            return ResponseEntity.badRequest().body(response); // 400 Bad Request 응답
         }
 
         // 이전 입찰자 결제 취소
@@ -94,8 +98,8 @@ public class AscendingPaymentService {
             fcmService.sendMessageTo(existingPayment.getMember().getDeviceToken(),
                     "입찰 실패!",
                     "누군가가 더 높은 금액으로 입찰을 시도했어요,,,",
-                    productId,
-                    NotificationType.PRODUCT);
+                    Long.toString(productId),
+                    "PRODUCT");
         }
 
         // 새로운 결제 저장
@@ -134,10 +138,16 @@ public class AscendingPaymentService {
         fcmService.sendMessageTo(product.getMember().getDeviceToken(),
                 "입찰 시도!",
                 "더 높은 금액의 입찰이 들어왔어요!",
-                productId,
-                NotificationType.PRODUCT);
+                Long.toString(productId),
+                "PRODUCT");
 
-        return "결제가 완료되었습니다. 새로운 입찰 금액: " + bidAmount;
+        // 결제가 완료되었을 때 JSON 응답 생성
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "결제가 완료되었습니다. 새로운 입찰 금액: " + bidAmount);
+        response.put("bidAmount", bidAmount);
+
+        // ResponseEntity를 사용하여 JSON 형식으로 반환
+        return ResponseEntity.ok(response);
     }
 
     private void cancelPayment(String impUid) {

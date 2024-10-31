@@ -1,6 +1,5 @@
 package Auction_shop.auction.web.dto.fcm;
 
-import Auction_shop.auction.web.fcm.NotificationType;
 import lombok.*;
 
 @Getter
@@ -12,6 +11,6 @@ public class FcmRequestDto {
     private String targetToken;
     private String title;
     private String body;
-    private NotificationType type;
-    private Long Id;
+    private String type;
+    private String Id;
 }
