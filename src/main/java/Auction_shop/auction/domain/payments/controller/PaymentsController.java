@@ -28,7 +28,7 @@ public class PaymentsController {
                                                    @PathVariable Long productId,
                                                    @PathVariable String impUid){
         Long memberId = jwtUtil.extractMemberId(authorization);
-        ResponseEntity<Map<String, Object>>  collect;
+        ResponseEntity<Map<String, Object>> collect;
         try {
             collect = descendingPaymentsService.PaymentsVerify(impUid, productId, memberId);
         } catch (Exception e) {
