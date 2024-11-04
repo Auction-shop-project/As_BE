@@ -21,11 +21,14 @@ public class FcmController {
         System.out.println("fcmRequestDto.getTargetToken() = " + fcmRequestDto.getTargetToken());
         System.out.println("fcmRequestDto.getTitle() = " + fcmRequestDto.getTitle());
         System.out.println("fcmRequestDto.getBody() = " + fcmRequestDto.getBody());
+        System.out.println("fcmRequestDto.getType() = " + fcmRequestDto.getType());
 
         firebaseCloudMessageService.sendMessageTo(
                 fcmRequestDto.getTargetToken(),
                 fcmRequestDto.getTitle(),
-                fcmRequestDto.getBody()
+                fcmRequestDto.getBody(),
+                fcmRequestDto.getId(),
+                fcmRequestDto.getType()
         );
         return ResponseEntity.ok().build();
     }

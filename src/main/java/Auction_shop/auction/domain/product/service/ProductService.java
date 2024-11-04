@@ -7,6 +7,7 @@ import Auction_shop.auction.web.dto.product.ProductDto;
 import Auction_shop.auction.web.dto.product.ProductUpdateDto;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface ProductService {
@@ -40,7 +41,7 @@ public interface ProductService {
     boolean deleteProductById(Long product_id);
 
     //상향식 경매 종료 체크
-    void checkProductToEnd();
+    void checkProductToEnd() throws IOException;
 
     //닉네임 변경후 물건 생성자명 변경
     void updateCreateBy(String oldNickname, String newNickname, Long memberId);

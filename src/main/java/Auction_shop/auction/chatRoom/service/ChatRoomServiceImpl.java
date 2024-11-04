@@ -138,4 +138,17 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         log.info("infoResponseDto.getRoomId={}", infoResponseDto.getRoomId());
         return infoResponseDto;
     }
+
+    /**
+     *
+     * @param roomId
+     * @return member
+     */
+    @Override
+    public Member findMemberByChatRoom(Long roomId) {
+        ChatRoom chatRoom = chatRoomRepository.findById(roomId)
+                .orElseThrow(()-> new RuntimeException("Room not found"));
+        Member member = memberService.getById(chatRoom.getYourId());
+        return member;
+    }
 }
