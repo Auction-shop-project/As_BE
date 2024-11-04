@@ -44,18 +44,18 @@ public class ChatRoomController {
         Optional<ChatRoom> chatRoomInfo = chatRoomService.findChatRoomInfo(userId, yourId, postId);
         // case 1
         if (chatRoomInfo.isEmpty()) {
-            Long newChatRoomId = chatRoomService.createNewChatRoom(userId, yourId, postId);
+            Long roomId = chatRoomService.createNewChatRoom(userId, yourId, postId);
             SseEmitter emitter = sseConnection.getEmitter(yourId);  // 상대방ID를 통해 상대방의 emitter를 가져옴
             if (emitter != null) {
-                sseConnection.sendEvent(emitter, "createdNewChatRoom", newChatRoomId);  // SSE를 통해 상대방에게 알림
+                sseConnection.sendEvent(emitter, "createdNewChatRoom", roomId);  // SSE를 통해 상대방에게 알림
             }
             if (emitter == null) {  // 상대방이 접속 중이 아닌 상태일 때 메세지 큐에 저장 후 나중에 상대방이 접속 시 생성된 채팅방 번호 제공
                 // Redis의 key로 문자열이 들어가기에 Long타입의 yourId를 String으로 변환하여 저장
                 String idTypeChange = String.valueOf(yourId);
-                messageQueue.opsForList().leftPush(idTypeChange, newChatRoomId);  // 메세지 큐에 저장
+                messageQueue.opsForList().leftPush(idTypeChange, roomId);  // 메세지 큐에 저장
             }
             ChatRoomCreateResponseDto chatRoomCreateResponseDto = new ChatRoomCreateResponseDto();
-            chatRoomCreateResponseDto.setNewChatRoomId(newChatRoomId);
+            chatRoomCreateResponseDto.setNewChatRoomId(roomId);
             return ResponseEntity.ok(chatRoomCreateResponseDto);
         }
 
