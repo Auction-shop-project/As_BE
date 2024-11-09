@@ -67,6 +67,7 @@ public class ChatRoomController {
         }
 
         // case 2
+        LOGGER.debug("enter case 2 : chatRoomInfo is not Empty");
         ChatRoom chatRoom = chatRoomInfo.get();
 
         // roomId를 꺼내 chat 테이블 조회
