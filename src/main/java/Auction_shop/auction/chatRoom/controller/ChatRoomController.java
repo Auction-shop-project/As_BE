@@ -34,6 +34,7 @@ public class ChatRoomController {
     @GetMapping("/chatroom/list/{userId}")
     public ResponseEntity<List<ChatRoomListResponseDto>> findChatRooms(@PathVariable Long userId) {
         List<ChatRoomListResponseDto> chatRooms = chatRoomService.findChatRoomsByUserId(userId);
+        LOGGER.debug("chatRooms's size = {}", chatRooms.size());
         return ResponseEntity.ok(chatRooms);
     }
 
