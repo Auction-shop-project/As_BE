@@ -9,7 +9,7 @@
 
     <!-- 로그 파일에 기록-->
     <appender name = "FILE" class = "ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>/var/log/myapp/application.log</file>
+        <file>/var/logs/application.log</file>
         <rollingPolicy class = "ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>/var/logs/application.%d{yyyy-MM-dd}.log</fileNamePattern>
             <maxHistory>30</maxHistory> <!-- 30일간 로그 보관-->
