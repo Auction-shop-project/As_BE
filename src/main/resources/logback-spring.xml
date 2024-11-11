@@ -11,7 +11,7 @@
     <appender name = "FILE" class = "ch.qos.logback.core.rolling.RollingFileAppender">
         <file>/var/log/myapp/application.log</file>
         <rollingPolicy class = "ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>/var/log/myapp/application.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <fileNamePattern>/var/logs/application.%d{yyyy-MM-dd}.log</fileNamePattern>
             <maxHistory>30</maxHistory> <!-- 30일간 로그 보관-->
         </rollingPolicy>
         <encoder>
