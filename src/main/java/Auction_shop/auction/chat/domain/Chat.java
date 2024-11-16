@@ -19,6 +19,7 @@ public class Chat {
     private String id;
     private Long roomId; // 채팅방번호
     private Long userId;
+    private Long yourId;
     private String message;
 
     @CreatedDate
