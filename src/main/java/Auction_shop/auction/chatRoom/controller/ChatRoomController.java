@@ -84,9 +84,9 @@ public class ChatRoomController {
     /**
      * 채팅방 퇴장
      */
-    @PostMapping("/chatroom/delete/{userId}/{postId}")
-    public ResponseEntity<String> delete(@PathVariable Long userId, @PathVariable Long postId) {
-        ChatRoom deleteRoom = chatRoomService.deleteChatRoom(userId, postId);
+    @PostMapping("/chatroom/delete/{userId}/{roomId}")
+    public ResponseEntity<String> delete(@PathVariable Long userId, @PathVariable Long roomId) {
+        ChatRoom deleteRoom = chatRoomService.deleteChatRoom(userId, roomId);
 
         if (deleteRoom == null) {
             return ResponseEntity.status(404).body("delete failed");
