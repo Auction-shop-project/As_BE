@@ -164,7 +164,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     }
 
     @Override
-    public ChatRoom isOtherUserLeft(Long userId, String roomId) {
+    public ChatRoom isOtherUserLeft(Long userId, Long roomId) {
         ChatRoom findOpponent = chatRoomRepository.findByYourIdAndRoomId(userId, roomId);
         return findOpponent;
     }

@@ -11,7 +11,7 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
     ChatRoom findFirstByRoomId(Long roomId);
     ChatRoom findByUserIdAndYourIdAndPostId(Long userId, Long yourId, Long postId);
     ChatRoom deleteChatRoomByUserIdAndPostId(Long userId, Long postId);
-    ChatRoom findByYourIdAndRoomId(Long userId, String roomId);
+    ChatRoom findByYourIdAndRoomId(Long userId, Long roomId);
 
     @Query("SELECT COUNT(CR) FROM ChatRoom CR")
     Long findChatRoomSize();
