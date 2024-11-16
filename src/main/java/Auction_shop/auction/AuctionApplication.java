@@ -11,7 +11,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @EnableJpaAuditing
 @EnableScheduling
-@EnableElasticsearchRepositories(basePackages = "Auction_shop.auction.domain.product.elasticRepository")
+@EnableElasticsearchRepositories(basePackages = "Auction_shop.auction.domain.product.repository")
 @SpringBootApplication
 public class AuctionApplication {
 

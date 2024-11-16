@@ -14,4 +14,6 @@ public interface ChatRoomService {
     Long createNewChatRoom(Long userId, Long yourId, Long postId);
     ChatRoomInfoResponseDto enterChatRoom(Long roomId);
     Member findMemberByChatRoom(Long roomId);
+    ChatRoom deleteChatRoom(Long userId, Long postId);
+    ChatRoom isOtherUserLeft(Long userId, Long roomId);
 }

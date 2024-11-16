@@ -14,6 +14,7 @@ import Auction_shop.auction.domain.product.service.ProductService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -150,5 +151,21 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                 .orElseThrow(()-> new RuntimeException("Room not found"));
         Member member = memberService.getById(chatRoom.getYourId());
         return member;
+    }
+
+    /**
+     * 채팅방 퇴장한 유저 정보 삭제
+     */
+    @Transactional
+    @Override
+    public ChatRoom deleteChatRoom(Long userId, Long postId) {
+        ChatRoom deleteRoom = chatRoomRepository.deleteChatRoomByUserIdAndPostId(userId, postId);
+        return deleteRoom;
+    }
+
+    @Override
+    public ChatRoom isOtherUserLeft(Long userId, Long roomId) {
+        ChatRoom findOpponent = chatRoomRepository.findByYourIdAndRoomId(userId, roomId);
+        return findOpponent;
     }
 }
