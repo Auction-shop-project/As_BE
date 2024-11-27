@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>결제 시스템</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.iamport.kr/js/iamport.payment-1.1.5.js"></script>
+</head>
+<body>
+
+<h1>상품 결제</h1>
+<button id="payButton">결제하기</button>
+
+
+<div id="result" style="margin-top: 20px;"></div>
+
+<script>
+    document.getElementById('payButton').addEventListener('click', function() {
+        const IMP = window.IMP;
+        IMP.init('imp06856072'); // 아임포트 가맹점 코드 입력
+
+        IMP.request_pay({
+            pg: 'html5_inicis', // PG사
+            pay_method: 'card', // 결제 수단
+            merchant_uid: 'IMP' + new Date().getTime(), // 주문 ID
+            name: '주문명', // 상품명
+            amount: 100, // 결제 금액
+            buyer_email: 'buyer@example.com', // 구매자 이메일
+            buyer_name: '구매자 이름', // 구매자 이름
+            buyer_tel: '010-1234-5678', // 구매자 전화번호
+            app_scheme: 'yourapp://callback', // 결제 후 리다이렉트할 URL
+        }, function (response) {
+            if (response.success) {
+
+                // 결제 성공
+                document.getElementById('result').innerText = '결제 성공: ' + response.imp_uid;
+
+                fetch(`/payments/1/${response.imp_uid}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        imp_uid: response.imp_uid,
+                        merchant_uid: response.merchant_uid,
+                        amount: response.paid_amount,
+                        status: response.status,
+                    }),
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        document.getElementById('result').innerText += '\n서버 응답: ' + data;
+                    })
+                    .catch(error => {
+                        document.getElementById('result').innerText += '\n서버 요청 실패: ' + error.message;
+                    });
+
+            } else {
+                // 결제 실패
+                document.getElementById('result').innerText = '결제 실패: ' + response.error_msg;
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

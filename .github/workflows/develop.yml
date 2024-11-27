@@ -1,0 +1,121 @@
+name: CI and CD
+
+on:
+  pull_request_target: # develop 브랜치로 pull request 이벤트 발생 시 실행
+    branches: [develop]
+    types: [opened, synchronize, reopened]
+
+env:
+  CLOUD_AWS_CREDENTIALS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
+  CLOUD_AWS_CREDENTIALS_SECRET_KEY: ${{ secrets.AWS_SECRET_KEY }}
+  CLOUD_AWS_REGION_STATIC: ap-southeast-2
+  CLOUD_AWS_S3_BUCKET: auction-shop-image
+  SPRING_JWT_SECRET: ${{ secrets.JWT_SECRET }}
+  SPRING_JWT_ACCESSTOKEN_EXPIRATION_TIME: 60000
+  SPRING_JWT_REFRESHTOKEN_EXPIRATION_TIME: 86400000
+  SPRING_DATA_MONGODB_HOST: ${{ secrets.MONGODB_HOST }}
+  SPRING_DATA_MONGODB_PORT: ${{ secrets.MONGODB_PORT }}
+  SPRING_DATA_REDIS_HOST: ${{ secrets.REDIS_HOST }}
+  SPRING_DATA_REDIS_PORT: ${{ secrets.REDIS_PORT }}
+  SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.MySQLDialect
+  SPRING_JPA_HIBERNATE_DDL_AUTO: create
+  SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.cj.jdbc.Driver
+  SPRING_DATASOURCE_URL: ${{ secrets.MYSQL_URL }}
+  SPRING_DATASOURCE_USERNAME: ${{ secrets.MYSQL_USERNAME }}
+  SPRING_DATASOURCE_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+  PROJECT_NAME: project_deploy
+
+jobs:
+  build:
+    runs-on: ubuntu-latest  # 실행 환경
+
+    steps:  # 작업 실행 단계
+
+      # PR 작성자가 repo에 대한 write 권한이 있는지 확인
+      - name: Get User Permission
+        id: checkAccess
+        uses: actions-cool/check-user-permission@v2
+        with:
+          require: write
+          username: ${{ github.triggering_actor }}
+        env:
+          GITHUB_TOKEN: ${{ github.triggering_actor }}
+
+      # PR 작성자가 권한이 없는 경우 워크플로우 종료
+      - name: Check User Permission
+        if: steps.checkAccess.outputs.require-result == 'false'
+        run: |
+          echo "${{ github.triggering_actor }} does not have permissions on this repo."
+          echo "Current permission level is ${{ steps.checkAccess.outputs.user-permission }}"
+          echo "Job originally triggered by ${{ github.actor }}"
+          exit 1
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Cache Gradle
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@417ae3ccd767c252f5661f1ace9f835f9654f2b5 # v3.1.0
+
+      # gradlew 파일을 실행할 권한 부여
+      - name : Grant Execution Permission
+        run : chmod +x ./gradlew
+
+      - name: Set YML
+        run: |
+          mkdir -p src/main/resources
+          echo "${{ secrets.APPLICATION_YML }}" | base64 --decode > src/main/resources/application.yml
+          find src
+
+      - name: Configure Firebase Admin SDK
+        run: |
+          mkdir -p src/main/resources/firebase
+          echo "${{ secrets.FCM_JSON }}" | base64 --decode > src/main/resources/firebase/serviceAccountKey.json
+
+      - name: Build with Gradle
+        run: ./gradlew build -i
+
+      # .zip으로 압축
+      # 현재 디렉토리의 파일과 하위 디렉토리를 압축
+      - name: Make Zip File
+        run: zip -qq -r ./$GITHUB_SHA.zip .
+        shell: bash
+
+      # aws 인증
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+          aws-region: ap-southeast-2
+
+      # Upload to S3 storage
+      - name: Upload to S3
+        run: aws s3 cp --region ap-southeast-2 ./$GITHUB_SHA.zip s3://$CLOUD_AWS_S3_BUCKET/$PROJECT_NAME/$GITHUB_SHA.zip
+
+      # AWS CodeDeploy 실행
+      - name: Code Deploy
+        run: |
+          aws deploy create-deployment \
+            --application-name ApplicationCodeDeploy \
+            --deployment-config-name CodeDeployDefault.AllAtOnce \
+            --deployment-group-name ApplicationCodeDeployGroup \
+            --s3-location bucket=$CLOUD_AWS_S3_BUCKET,bundleType=zip,key=$PROJECT_NAME/$GITHUB_SHA.zip \
+            --ignore-application-stop-failures
